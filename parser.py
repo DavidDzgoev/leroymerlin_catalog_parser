@@ -29,7 +29,10 @@ def get_excel_from_category(category_name):
 
     # get number of pages
     pages = soup.find_all("a", {"class": "bex6mjh_plp o1ojzgcq_plp l7pdtbg_plp r1yi03lb_plp sj1tk7s_plp"})
-    n = int(pages[-1].find("span", {"class": "cef202m_plp"}).text)  # number of pages
+    if len(pages) == 0:
+        n = 1
+    else:
+        n = int(pages[-1].find("span", {"class": "cef202m_plp"}).text)  # number of pages
 
     # parsing loop
     data = []
@@ -43,7 +46,7 @@ def get_excel_from_category(category_name):
         for product in products:
             data.append(product)
 
-    res = pd.DataFrame(columns=['Арт.', 'Наименование', 'Цена', 'Фото'])
+    res = pd.DataFrame(columns=['Арт.', 'Фото', 'Наименование', 'Цена'])
     for product in data:
         vendor_code = product.find("span", {"class": "t3y6ha_plp sn92g85_plp p16wqyak_plp"}).text
         name = product.find("span", {"class": "t9jup0e_plp p1h8lbu4_plp"}).text
@@ -52,9 +55,9 @@ def get_excel_from_category(category_name):
         img = product.find("img", {"class": "p1g8n69v_plp"}).get("src")
 
         res = res.append({'Арт.': vendor_code,
+                          'Фото': img,
                           'Наименование': name,
-                          'Цена': price + amount,
-                          'Фото': img},
+                          'Цена': price + amount},
                          ignore_index=True)
 
     writer = pd.ExcelWriter(f'{category_name}.xlsx', engine='xlsxwriter')
@@ -66,11 +69,11 @@ def get_excel_from_category(category_name):
         img_src = row["Фото"]
 
         download_jpg(file_name, img_src)
-        worksheet.insert_image(f'D{index + 2}', file_name)
-        worksheet.write(f'D{index + 2}', " ")
+        worksheet.insert_image(f'B{index + 2}', file_name, {'x_offset': 2, 'y_offset': 2, 'positioning': 1})
+        worksheet.write(f'B{index + 2}', " ")
         worksheet.set_row(index + 1, 100)
 
-    worksheet.set_column('D:D', 18)
+    worksheet.set_column('B:B', 18)
 
     writer.save()
 

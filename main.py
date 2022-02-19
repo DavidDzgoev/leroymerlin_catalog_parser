@@ -1,11 +1,16 @@
-from flask import send_file, Flask, request, after_this_request
+from flask import send_file, Flask, render_template, after_this_request
 from parser import get_excel_from_category
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 
 
-@app.route('/get_excel/<cat>')
+@app.route('/leroymerlin_parser')
+def root():
+    return render_template('index.html')
+
+
+@app.route('/leroymerlin_parser/get_excel/<cat>')
 def get_xlsx(cat):
     get_excel_from_category(cat)
 
@@ -21,4 +26,5 @@ def get_xlsx(cat):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 80))
+    app.run(host='0.0.0.0', port=port)
