@@ -61,7 +61,7 @@ def get_excel_from_category(category_name):
         amount = product.find("p", {"class": "t3y6ha_plp x9a98_plp pb3lgg7_plp"}).text
         img = product.find("img", {"class": "p1g8n69v_plp"}).get("src")
 
-        res = res.append({'Арт.': vendor_code,
+        res = res.append({'Арт.': vendor_code[5:],  # avoid "Арт." in string
                           'Фото': img,
                           'Наименование': name,
                           'Цена': price + amount},
