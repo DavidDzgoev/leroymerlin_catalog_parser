@@ -1,7 +1,7 @@
 import requests as r
 import bs4 as bs
 from time import time
-from fake_useragent import UserAgent
+from user_agent import generate_user_agent
 import pandas as pd
 import os
 
@@ -21,10 +21,17 @@ def download_jpg(f_name, link):
 
 
 def get_excel_from_category(category_name):
-    user = UserAgent()
+    """Get .xlsx file by parsing leroymerlin.ru
+
+    :param category_name: str
+    :return: None
+    """
 
     # get page of category
-    req = r.get(f'https://leroymerlin.ru/catalogue/{category_name}/', headers={'User-Agent': user.random}).text
+    req = r.get(
+        f'https://leroymerlin.ru/catalogue/{category_name}/',
+        headers={'User-Agent': generate_user_agent()}
+    ).text
     soup = bs.BeautifulSoup(req, features="html.parser")
 
     # get number of pages
@@ -38,7 +45,7 @@ def get_excel_from_category(category_name):
     data = []
     for i in range(1, n + 1):
         req = r.get(f'https://leroymerlin.ru/catalogue/{category_name}/?page={i}',
-                    headers={'User-Agent': user.random}).text
+                    headers={'User-Agent': generate_user_agent()}).text
         soup = bs.BeautifulSoup(req, features="html.parser")
 
         products = soup.find_all("div", {"class": "phytpj4_plp largeCard"})  # product element
